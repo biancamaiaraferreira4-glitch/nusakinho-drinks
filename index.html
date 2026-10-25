@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5b1e78">
+<title>Nusakinho Drinks | Pedidos</title>
+<style>
+:root{--roxo:#5b1e78;--roxo2:#7b3c99;--bg:#f6f3f8;--card:#fff;--text:#241d29;--muted:#706777;--line:#e7e0eb;--green:#16794b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,var(--roxo),var(--roxo2));color:#fff;padding:22px 16px 18px}header h1{font-size:23px;margin:0 0 4px}header p{margin:0;opacity:.9;font-size:14px}
+nav{display:flex;gap:7px;padding:10px;background:#fff;overflow-x:auto;position:sticky;top:0;z-index:2;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap;border:0;border-radius:10px;background:#f0eaf4;color:var(--roxo);padding:10px 13px;font-weight:700}
+nav button.active{background:var(--roxo);color:#fff}
+main{max-width:900px;margin:auto;padding:14px 12px 40px}.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:13px;box-shadow:0 2px 8px #32154408}
+h2{font-size:19px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px;color:var(--roxo)}
+label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:10px 0 5px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d9cfdf;border-radius:10px;background:#fff;font:inherit;color:var(--text)}
+button{cursor:pointer;font:inherit}.primary{background:var(--roxo);color:white;border:0;border-radius:10px;padding:12px 15px;font-weight:700}.secondary{background:#efe6f4;color:var(--roxo);border:0;border-radius:10px;padding:10px 12px;font-weight:700}.danger{background:#fff0f0;color:#a22;border:0;border-radius:10px;padding:9px 11px}.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}.muted{color:var(--muted);font-size:13px}.statgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#f6f0fa;border-radius:12px;padding:12px}.stat strong{display:block;font-size:23px;color:var(--roxo)}.stat span{font-size:12px;color:var(--muted)}
+.productrow{display:grid;grid-template-columns:1fr 76px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.productrow:last-child{border:0}.productrow input{padding:9px;text-align:center}.productname{font-size:14px}.category{font-weight:800;color:var(--roxo);margin:14px 0 2px}
+.item{border-bottom:1px solid var(--line);padding:11px 0}.item:last-child{border:0}.itemtop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.itemtop strong{font-size:15px}.itemtop small{display:block;color:var(--muted);margin-top:3px}.right{text-align:right}.pill{font-size:12px;background:#eee4f4;color:var(--roxo);border-radius:20px;padding:4px 8px;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted)}.tablewrap{overflow-x:auto}
+.empty{padding:18px;text-align:center;color:var(--muted);background:#faf8fb;border-radius:12px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.totalbar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px;margin:0 -12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hidden{display:none!important}.smallbtn{padding:7px 9px;font-size:12px}
+@media(min-width:650px){.statgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.totalbar{margin:0;border-radius:12px}}
+</style>
+</head>
+<body>
+<section id="loginGate" style="max-width:520px;margin:8vh auto;padding:16px;">
+  <div class="card">
+    <h2>🔐 Acesso ao Nusakinho Drinks</h2>
+    <p class="muted">Entre com o e-mail e a senha já cadastrados no Firebase. Nos dois aparelhos, usem exatamente o mesmo login e senha para compartilhar os pedidos.</p>
+    <label>E-mail</label><input id="authEmail" type="email" autocomplete="username" value="luana-vins@hotmail.com" placeholder="seu e-mail">
+    <label>Senha</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Sua senha">
+    <button class="primary" style="width:100%;margin-top:12px" onclick="window.nusakinhoLogin?.()">Entrar</button>
+    <p id="authMessage" class="muted" role="status"></p>
+    <details style="margin-top:16px"><summary>Configurar conexão Firebase (primeiro acesso)</summary>
+      <p class="muted">No Firebase Console, abra Configurações do projeto → Geral → Seus apps → configuração do SDK da Web. Cole abaixo o objeto firebaseConfig completo. Não coloque sua senha aqui.</p>
+      <label>Configuração firebaseConfig (JSON)</label>
+      <textarea id="firebaseConfigInput" rows="7" placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"https://nusakinho-drinks-default-rtdb.firebaseio.com","projectId":"nusakinho-drinks","appId":"..."}'></textarea>
+      <button class="secondary" style="margin-top:8px" onclick="window.nusakinhoSaveConfig?.()">Salvar configuração</button>
+    </details>
+  </div>
+</section>
+<div id="appShell" class="hidden">
+<header><h1>🥤 Nusakinho Drinks</h1><p>Pedidos, separação, produção semanal e financeiro</p><button class="secondary" style="margin-top:10px" onclick="window.nusakinhoLogout?.()">Sair</button></header>
+<nav>
+<button class="active" data-tab="inicio">Resumo</button><button data-tab="pedido">Novo pedido</button><button data-tab="pedidos">Pedidos</button><button data-tab="producao">Produção</button><button data-tab="clientes">Clientes</button><button data-tab="produtos">Produtos e preços</button>
+</nav>
+<main>
+<section id="inicio" class="panel active">
+<div class="card"><h2>Resumo da semana</h2><div class="statgrid"><div class="stat"><strong id="statOrders">0</strong><span>Pedidos na semana</span></div><div class="stat"><strong id="statUnits">0</strong><span>Unidades vendidas</span></div><div class="stat"><strong id="statRevenue">R$ 0,00</strong><span>Valor dos pedidos</span></div><div class="stat"><strong id="statClients">0</strong><span>Clientes cadastrados</span></div></div><p class="muted">Os dados ficam salvos neste navegador e neste aparelho. Faça uma cópia/backup regularmente.</p></div>
+<div class="card"><h2>Acesso rápido</h2><div class="actions"><button class="primary" onclick="showTab('pedido')">＋ Lançar pedido</button><button class="secondary" onclick="showTab('producao')">Ver total para a fábrica</button></div></div>
+<div class="card"><h2>Como começar</h2><p>1. Cadastre suas adegas em <b>Clientes</b>.</p><p>2. Confira os produtos e preencha os preços em <b>Produtos e preços</b>.</p><p>3. Lance cada pedido recebido no WhatsApp em <b>Novo pedido</b>.</p><p>4. No fechamento da semana, abra <b>Produção</b> para somar os sabores e compartilhar o relatório.</p></div>
+</section>
+<section id="pedido" class="panel">
+<div class="card"><h2>Novo pedido</h2>
+<label>Cliente / adega</label><select id="orderClient"><option value="">Selecione o cliente</option></select>
+<div class="row"><div><label>Data do pedido</label><input id="orderDate" type="date"></div><div><label>Observação (opcional)</label><input id="orderNote" placeholder="Ex.: entregar sexta"></div></div>
+<label>Buscar produto</label><input id="productSearch" placeholder="Digite o nome do sabor..." oninput="renderOrderProducts()">
+<div id="orderProducts"></div>
+<div class="totalbar"><div><div class="muted">Total do pedido</div><strong id="orderTotal">R$ 0,00</strong></div><button class="primary" onclick="saveOrder()">Salvar pedido</button></div>
+<p class="muted">Informe somente a quantidade de cada produto. Os valores são calculados conforme os preços cadastrados.</p>
+</div></section>
+<section id="pedidos" class="panel"><div class="card"><h2>Pedidos registrados</h2><div class="row"><div><label>Filtrar por semana</label><input type="week" id="ordersWeek" onchange="renderOrders()"></div><div><label>Buscar cliente</label><input id="ordersSearch" placeholder="Nome da adega" oninput="renderOrders()"></div></div><div id="ordersList"></div></div></section>
+<section id="producao" class="panel"><div class="card"><h2>Fechamento para produção</h2><label>Semana de produção</label><input type="week" id="productionWeek" onchange="renderProduction()"><div class="statgrid" style="margin-top:12px"><div class="stat"><strong id="prodOrders">0</strong><span>Pedidos</span></div><div class="stat"><strong id="prodUnits">0</strong><span>Unidades no total</span></div><div class="stat"><strong id="prodRevenue">R$ 0,00</strong><span>Valor dos pedidos</span></div><div class="stat"><strong id="prodClients">0</strong><span>Clientes</span></div></div><div id="productionList"></div><div class="actions"><button class="primary" onclick="shareProduction()">Compartilhar relatório</button><button class="secondary" onclick="downloadProduction()">Baixar CSV</button></div><p class="muted">O relatório soma os produtos dos pedidos da semana selecionada.</p></div>
+<div class="card"><h2>Separação por cliente</h2><label>Escolha o pedido</label><select id="pickOrder" onchange="renderPicklist()"></select><div id="pickList"></div><div class="actions"><button class="secondary" onclick="sharePicklist()">Compartilhar lista</button></div></div></section>
+<section id="clientes" class="panel"><div class="card"><h2>Cadastrar cliente</h2><label>Nome da adega / cliente</label><input id="clientName" placeholder="Ex.: Adega Central"><div class="row"><div><label>Telefone / WhatsApp</label><input id="clientPhone" placeholder="(11) 99999-9999" inputmode="tel"></div><div><label>Cidade</label><input id="clientCity" placeholder="Cidade"></div></div><label>Endereço</label><input id="clientAddress" placeholder="Rua, número e bairro"><button class="primary" style="margin-top:12px" onclick="saveClient()">Salvar cliente</button></div><div class="card"><h2>Clientes cadastrados</h2><div id="clientsList"></div></div></section>
+<section id="produtos" class="panel"><div class="card"><h2>Produtos e preços</h2><p class="muted">Os produtos foram pré-cadastrados com base na sua folha. Confira os nomes e preencha o preço unitário de venda.</p><label>Adicionar produto</label><div class="row"><input id="newProductName" placeholder="Nome do produto"><input id="newProductCat" placeholder="Categoria"></div><button class="secondary" style="margin-top:8px" onclick="addProduct()">Adicionar produto</button><div id="productAdmin"></div></div></section>
+</main>
+</div>
+<script>
+const starter = [
+["Batida de Maracujá","Drinks e coquetéis"],["Speed Racer","Drinks e coquetéis"],["Alexsander","Drinks e coquetéis"],["Pinacolada","Drinks e coquetéis"],["Green Ocean","Drinks e coquetéis"],["Crazy Bullet","Drinks e coquetéis"],["Vodka Galaxy Energética","Drinks e coquetéis"],["Vodka Galaxy Melancia","Drinks e coquetéis"],["Vodka Galaxy Frutas Vermelhas","Drinks e coquetéis"],["Vodka Galaxy Coco e Açaí","Drinks e coquetéis"],["Vodka Galaxy Tropical","Drinks e coquetéis"],["Sex on the Beach","Drinks e coquetéis"],["Splash Lemon","Drinks e coquetéis"],["Yakult","Drinks e coquetéis"],["Mojito","Drinks e coquetéis"],["Eletric Limonade","Drinks e coquetéis"],["Espanhola","Drinks e coquetéis"],
+["Frozen Galak","Frozen"],["Frozen de Prestígio","Frozen"],["Frozen de Coco","Frozen"],["Frozen de Alpino","Frozen"],["Frozen Morango","Frozen"],["Frozen de Sensação","Frozen"],["Frozen Paçoca","Frozen"],["Frozen Babaloo","Frozen"],["Frozen de Limão","Frozen"],
+["Whiskey Strawberry","Whisky"],["Whiskey Passion Fruit","Whisky"],["Whiskey de Pêssego","Whisky"],["Whiskey de Açaí","Whisky"],
+["Tequila Sun Green","Tequila"],["Tequila Sun Red","Tequila"],
+["Gin Energy","Gin"],["Gin Tônica","Gin"],["Gin Red Berry","Gin"],["Gin Maracujá e Melão","Gin"],["Gin Melancia","Gin"],["Gin Tropical","Gin"],["Gin Peach","Gin"],
+["Pôr do Sol","Sem álcool"],["Lagoa Azul","Sem álcool"],["Green Ocean","Sem álcool"],["Mojito","Sem álcool"],["Frozen Coco","Sem álcool"],["Frozen Morango","Sem álcool"],["Grape Mix de Uva","Sem álcool"],
+["Caipirinha de Morango — Vodka","Caipirinha"],["Caipirinha de Morango — Saquê","Caipirinha"],["Caipirinha de Morango — Jurupinga","Caipirinha"],["Caipirinha de Morango — Cachaça","Caipirinha"],["Caipirinha de Morango — Gin","Caipirinha"],
+["Caipirinha de Limão — Vodka","Caipirinha"],["Caipirinha de Limão — Saquê","Caipirinha"],["Caipirinha de Limão — Jurupinga","Caipirinha"],["Caipirinha de Limão — Cachaça","Caipirinha"],["Caipirinha de Limão — Gin","Caipirinha"],
+["Caipirinha Tropical — Vodka","Caipirinha"],["Caipirinha Tropical — Saquê","Caipirinha"],["Caipirinha Tropical — Jurupinga","Caipirinha"],["Caipirinha Tropical — Cachaça","Caipirinha"],["Caipirinha Tropical — Gin","Caipirinha"],
+["Caipirinha de Maracujá — Vodka","Caipirinha"],["Caipirinha de Maracujá — Saquê","Caipirinha"],["Caipirinha de Maracujá — Jurupinga","Caipirinha"],["Caipirinha de Maracujá — Cachaça","Caipirinha"],["Caipirinha de Maracujá — Gin","Caipirinha"],
+["Caipirinha de Abacaxi — Vodka","Caipirinha"],["Caipirinha de Abacaxi — Saquê","Caipirinha"],["Caipirinha de Abacaxi — Jurupinga","Caipirinha"],["Caipirinha de Abacaxi — Cachaça","Caipirinha"],["Caipirinha de Abacaxi — Gin","Caipirinha"],
+["Caipirinha de Frutas Vermelhas — Vodka","Caipirinha"],["Caipirinha de Frutas Vermelhas — Saquê","Caipirinha"],["Caipirinha de Frutas Vermelhas — Jurupinga","Caipirinha"],["Caipirinha de Frutas Vermelhas — Cachaça","Caipirinha"],["Caipirinha de Frutas Vermelhas — Gin","Caipirinha"]
+];
+const key='nusakinho_system_v1';
+let db; try{db=JSON.parse(localStorage.getItem(key))||null}catch(e){}
+if(!db) db={clients:[],products:starter.map((x,i)=>({id:i+1,name:x[0],category:x[1],price:0})),orders:[],nextClient:1,nextProduct:starter.length+1,nextOrder:1};
+function persist(){localStorage.setItem(key,JSON.stringify(db));refreshAll();if(window.nusakinhoCloudSave)window.nusakinhoCloudSave(db).catch(e=>console.error('Firebase save failed',e))}
+function money(n){return (Number(n)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function localDate(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function weekOf(date){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+3-((d.getDay()+6)%7));let w1=new Date(d.getFullYear(),0,4);let wk=1+Math.round(((d-w1)/86400000-3+((w1.getDay()+6)%7))/7);return `${d.getFullYear()}-W${String(wk).padStart(2,'0')}`}
+function orderWeek(o){return weekOf(o.date)}
+function showTab(id){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));if(id==='pedido')renderOrderProducts();if(id==='producao'){renderProduction();renderPickOptions()}if(id==='pedidos')renderOrders();window.scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.getElementById('orderDate').value=localDate();document.getElementById('ordersWeek').value=weekOf(localDate());document.getElementById('productionWeek').value=weekOf(localDate());
+function saveClient(){let name=document.getElementById('clientName').value.trim();if(!name)return alert('Digite o nome da adega.');db.clients.push({id:db.nextClient++,name,phone:document.getElementById('clientPhone').value.trim(),city:document.getElementById('clientCity').value.trim(),address:document.getElementById('clientAddress').value.trim()});['clientName','clientPhone','clientCity','clientAddress'].forEach(id=>document.getElementById(id).value='');persist();alert('Cliente salvo!')}
+function renderClients(){let el=document.getElementById('clientsList');el.innerHTML=db.clients.length?db.clients.map(c=>`<div class="item"><div class="itemtop"><div><strong>${esc(c.name)}</strong><small>${esc([c.city,c.phone,c.address].filter(Boolean).join(' • '))}</small></div><button class="danger smallbtn" onclick="deleteClient(${c.id})">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum cliente cadastrado ainda.</div>';let sel=document.getElementById('orderClient');let old=sel.value;sel.innerHTML='<option value="">Selecione o cliente</option>'+db.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');if(old)sel.value=old}
+function deleteClient(id){if(!confirm('Excluir este cliente? Pedidos já lançados serão mantidos.'))return;db.clients=db.clients.filter(c=>c.id!==id);persist()}
+function addProduct(){let name=document.getElementById('newProductName').value.trim(),cat=document.getElementById('newProductCat').value.trim()||'Outros';if(!name)return alert('Digite o nome do produto.');db.products.push({id:db.nextProduct++,name,category:cat,price:0});document.getElementById('newProductName').value='';document.getElementById('newProductCat').value='';persist()}
+function renderProductAdmin(){let el=document.getElementById('productAdmin');let groups={};db.products.forEach(p=>(groups[p.category]??=[]).push(p));el.innerHTML=Object.entries(groups).map(([cat,ps])=>`<h3>${esc(cat)}</h3>`+ps.map(p=>`<div class="productrow"><div class="productname">${esc(p.name)}<div class="muted">Preço unitário</div></div><div><input aria-label="Preço ${esc(p.name)}" type="number" min="0" step="0.01" value="${p.price||''}" placeholder="R$" onchange="setPrice(${p.id},this.value)"></div></div>`).join('')).join('')}
+function setPrice(id,val){let p=db.products.find(p=>p.id===id);if(p)p.price=Math.max(0,Number(val)||0);localStorage.setItem(key,JSON.stringify(db));refreshHome();renderOrders();renderProduction()}
+function renderOrderProducts(){let q=(document.getElementById('productSearch')?.value||'').toLowerCase();let groups={};db.products.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)).forEach(p=>(groups[p.category]??=[]).push(p));let el=document.getElementById('orderProducts');el.innerHTML=Object.entries(groups).map(([cat,ps])=>`<div class="category">${esc(cat)}</div>`+ps.map(p=>`<div class="productrow"><div class="productname">${esc(p.name)}<div class="muted">${money(p.price)} por unidade</div></div><input type="number" min="0" step="1" value="${window.quantities?.[p.id]||''}" placeholder="0" data-pid="${p.id}" onchange="setQty(${p.id},this.value)" oninput="setQty(${p.id},this.value)"></div>`).join('')).join('');if(!window.quantities)window.quantities={};updateOrderTotal()}
+window.quantities={};
+function setQty(id,val){window.quantities[id]=Math.max(0,parseInt(val)||0);updateOrderTotal()}
+function updateOrderTotal(){let total=0;db.products.forEach(p=>total+=(window.quantities?.[p.id]||0)*p.price);document.getElementById('orderTotal').textContent=money(total)}
+function saveOrder(){let clientId=Number(document.getElementById('orderClient').value);if(!clientId)return alert('Selecione o cliente.');let items=db.products.filter(p=>(window.quantities[p.id]||0)>0).map(p=>({productId:p.id,name:p.name,category:p.category,qty:window.quantities[p.id],price:p.price}));if(!items.length)return alert('Informe a quantidade de pelo menos um produto.');let date=document.getElementById('orderDate').value||localDate();db.orders.push({id:db.nextOrder++,clientId,date,note:document.getElementById('orderNote').value.trim(),items,total:items.reduce((s,i)=>s+i.qty*i.price,0)});window.quantities={};document.getElementById('orderNote').value='';document.getElementById('productSearch').value='';persist();document.getElementById('orderDate').value=localDate();alert('Pedido salvo com sucesso!');showTab('pedidos')}
+function renderOrders(){let week=document.getElementById('ordersWeek').value;let q=(document.getElementById('ordersSearch').value||'').toLowerCase();let arr=db.orders.filter(o=>(!week||orderWeek(o)===week)&&((db.clients.find(c=>c.id===o.clientId)?.name||'').toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date));let el=document.getElementById('ordersList');el.innerHTML=arr.length?arr.map(o=>{let c=db.clients.find(c=>c.id===o.clientId);let units=o.items.reduce((s,i)=>s+i.qty,0);return `<div class="item"><div class="itemtop"><div><strong>${esc(c?.name||'Cliente excluído')}</strong><small>${esc(o.date)} • ${units} unidades • ${o.items.length} produtos</small>${o.note?`<small>${esc(o.note)}</small>`:''}</div><div class="right"><b>${money(o.total)}</b><div class="actions"><button class="secondary smallbtn" onclick="openPick(${o.id})">Separação</button><button class="danger smallbtn" onclick="deleteOrder(${o.id})">Excluir</button></div></div></div></div>`}).join(''):'<div class="empty">Nenhum pedido encontrado para esse filtro.</div>'}
+function deleteOrder(id){if(!confirm('Excluir este pedido?'))return;db.orders=db.orders.filter(o=>o.id!==id);persist()}
+function getWeekOrders(){let w=document.getElementById('productionWeek').value;return db.orders.filter(o=>!w||orderWeek(o)===w)}
+function renderProduction(){let arr=getWeekOrders(), map={};arr.forEach(o=>o.items.forEach(i=>{let k=i.productId+'|'+i.name;map[k]??={name:i.name,category:i.category,qty:0,revenue:0};map[k].qty+=i.qty;map[k].revenue+=i.qty*i.price}));let lines=Object.values(map).sort((a,b)=>a.category.localeCompare(b.category)||a.name.localeCompare(b.name));let units=lines.reduce((s,x)=>s+x.qty,0),rev=arr.reduce((s,o)=>s+o.total,0);document.getElementById('prodOrders').textContent=arr.length;document.getElementById('prodUnits').textContent=units;document.getElementById('prodRevenue').textContent=money(rev);document.getElementById('prodClients').textContent=new Set(arr.map(o=>o.clientId)).size;document.getElementById('productionList').innerHTML=lines.length?`<h3>Quantidade por produto</h3><div class="tablewrap"><table><thead><tr><th>Categoria</th><th>Produto / sabor</th><th>Qtd.</th><th>Valor</th></tr></thead><tbody>${lines.map(x=>`<tr><td>${esc(x.category)}</td><td>${esc(x.name)}</td><td><b>${x.qty}</b></td><td>${money(x.revenue)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Ainda não há pedidos nesta semana.</div>';renderPickOptions()}
+function renderPickOptions(){let sel=document.getElementById('pickOrder'),old=sel.value;sel.innerHTML='<option value="">Selecione um pedido</option>'+getWeekOrders().map(o=>{let c=db.clients.find(c=>c.id===o.clientId);return `<option value="${o.id}">${esc(c?.name||'Cliente')} — ${o.date} — ${money(o.total)}</option>`}).join('');if(old)sel.value=old;renderPicklist()}
+function renderPicklist(){let id=Number(document.getElementById('pickOrder').value),o=db.orders.find(o=>o.id===id),el=document.getElementById('pickList');if(!o){el.innerHTML='<div class="empty">Escolha um pedido para ver a lista de separação.</div>';return}let c=db.clients.find(c=>c.id===o.clientId);el.innerHTML=`<div class="card"><h3>${esc(c?.name||'Cliente')}</h3><p class="muted">${esc(o.date)} ${c?.address?'• '+esc(c.address):''}</p>${o.items.map(i=>`<div class="productrow"><div class="productname">${esc(i.name)}</div><b style="text-align:center">${i.qty}</b></div>`).join('')}<p><b>Total: ${money(o.total)}</b></p></div>`}
+function productionText(){let arr=getWeekOrders(),map={};arr.forEach(o=>o.items.forEach(i=>{let k=i.productId+'|'+i.name;map[k]??={name:i.name,category:i.category,qty:0};map[k].qty+=i.qty}));let w=document.getElementById('productionWeek').value||'semana selecionada';return `NUSAKINHO DRINKS — PRODUÇÃO SEMANAL\nSemana: ${w}\nPedidos: ${arr.length}\nTotal de unidades: ${arr.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0)}\n\n`+Object.values(map).sort((a,b)=>a.category.localeCompare(b.category)||a.name.localeCompare(b.name)).map(x=>`${x.category} — ${x.name}: ${x.qty} un.`).join('\n')+`\n\nValor total dos pedidos: ${money(arr.reduce((s,o)=>s+o.total,0))}`}
+async function shareText(text){if(navigator.share){try{await navigator.share({title:'Nusakinho Drinks',text})}catch(e){}}else{try{await navigator.clipboard.writeText(text);alert('Texto copiado! Cole no WhatsApp.')}catch(e){prompt('Copie o texto abaixo e envie pelo WhatsApp:',text)}}}
+function shareProduction(){shareText(productionText())}
+function sharePicklist(){let o=db.orders.find(o=>o.id===Number(document.getElementById('pickOrder').value));if(!o)return alert('Escolha um pedido.');let c=db.clients.find(c=>c.id===o.clientId);shareText(`NUSAKINHO DRINKS — SEPARAÇÃO\nCliente: ${c?.name||'Cliente'}\nData: ${o.date}\n\n${o.items.map(i=>`${i.name}: ${i.qty} un.`).join('\n')}\n\nTotal: ${money(o.total)}`)}
+function downloadProduction(){let arr=getWeekOrders(),map={};arr.forEach(o=>o.items.forEach(i=>{let k=i.productId+'|'+i.name;map[k]??={category:i.category,name:i.name,qty:0,revenue:0};map[k].qty+=i.qty;map[k].revenue+=i.qty*i.price}));let rows=[['Categoria','Produto','Quantidade','Valor'],...Object.values(map).map(x=>[x.category,x.name,x.qty,x.revenue.toFixed(2).replace('.',',')])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');let blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='nusakinho-producao-semanal.csv';a.click();URL.revokeObjectURL(url)}
+function refreshHome(){let arr=db.orders.filter(o=>orderWeek(o)===weekOf(localDate()));document.getElementById('statOrders').textContent=arr.length;document.getElementById('statUnits').textContent=arr.reduce((s,o)=>s+o.items.reduce((a,i)=>a+i.qty,0),0);document.getElementById('statRevenue').textContent=money(arr.reduce((s,o)=>s+o.total,0));document.getElementById('statClients').textContent=db.clients.length}
+function refreshAll(){renderClients();renderProductAdmin();renderOrderProducts();renderOrders();renderProduction();refreshHome()}
+window.nusakinhoApplyRemote = function(remote){
+  if(remote && typeof remote==='object'){
+    db={clients:Array.isArray(remote.clients)?remote.clients:[],products:Array.isArray(remote.products)?remote.products:[],orders:Array.isArray(remote.orders)?remote.orders:[],nextClient:Number(remote.nextClient)||1,nextProduct:Number(remote.nextProduct)||1,nextOrder:Number(remote.nextOrder)||1};
+    localStorage.setItem(key,JSON.stringify(db)); refreshAll();
+  }
+};
+window.nusakinhoGetLocal = ()=>db;
+refreshAll();
+</script>
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+const CONFIG_KEY='nusakinho_firebase_config_v1';
+const firebaseConfig = {
+  apiKey: "AIzaSyBCsyhXPSmgNUOu2FpEvmfRCzKiAceMCRo",
+  authDomain: "nusakinho-drinks.firebaseapp.com",
+  databaseURL: "https://nusakinho-drinks-default-rtdb.firebaseio.com",
+  projectId: "nusakinho-drinks",
+  storageBucket: "nusakinho-drinks.firebasestorage.app",
+  messagingSenderId: "51107664170",
+  appId: "1:51107664170:web:ccc69cae1b349871ca8e53",
+  measurementId: "G-6HZXDRWQPH"
+};
+let auth=null, database=null, currentUser=null, remoteReady=false, unsubscribe=null, saveQueue=Promise.resolve();
+const $=id=>document.getElementById(id);
+function message(t){$('authMessage').textContent=t||''}
+function readConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'null')||firebaseConfig}catch{return firebaseConfig}}
+function validateConfig(c){return c && c.apiKey && c.authDomain && c.databaseURL && c.projectId && c.appId}
+function showApp(on){$('appShell').classList.toggle('hidden',!on);$('loginGate').classList.toggle('hidden',on)}
+window.nusakinhoSaveConfig=()=>{
+  try{const c=JSON.parse($('firebaseConfigInput').value);if(!validateConfig(c))throw new Error('O JSON precisa conter apiKey, authDomain, databaseURL, projectId e appId.');localStorage.setItem(CONFIG_KEY,JSON.stringify(c));message('Configuração salva neste aparelho. Agora entre com seu e-mail e senha.');initFirebase();}
+  catch(e){message('Configuração inválida: '+e.message)}
+};
+window.nusakinhoLogin=async()=>{
+  if(!auth){message('Configure o Firebase primeiro, usando o objeto firebaseConfig do seu projeto.');return}
+  const email=$('authEmail').value.trim(),password=$('authPassword').value;
+  if(!email||!password){message('Digite o e-mail e a senha.');return}
+  message('Entrando...');try{await signInWithEmailAndPassword(auth,email,password);message('')}catch(e){message('Não foi possível entrar. Confira o e-mail e a senha. ('+e.code+')')}
+};
+window.nusakinhoLogout=async()=>{if(auth)await signOut(auth)};
+function initFirebase(){
+ const c=readConfig();if(!validateConfig(c)){message('Abra “Configurar conexão Firebase” e cole a configuração Web do projeto.');return}
+ try{
+  const app=getApps().find(a=>a.name==='nusakinho-app')||initializeApp(c,'nusakinho-app');auth=getAuth(app);database=getDatabase(app);
+  onAuthStateChanged(auth, user=>{
+   currentUser=user;remoteReady=false;
+   if(unsubscribe){unsubscribe();unsubscribe=null}
+   if(!user){showApp(false);return}
+   showApp(true);message('Conectando aos pedidos compartilhados...');
+   const dataRef=ref(database,'nusakinho');
+   unsubscribe=onValue(dataRef,snap=>{
+    const remote=snap.val();
+    if(remote){window.nusakinhoApplyRemote(remote)}
+    else if(!remoteReady){const local=window.nusakinhoGetLocal();set(dataRef,local).catch(e=>message('Erro ao iniciar banco: '+e.message))}
+    remoteReady=true;if(remote)message('Conectado. Pedidos sincronizados entre os aparelhos.');else message('Banco conectado. Preparando os dados compartilhados...');
+   },err=>{message('Erro ao ler o banco: '+err.message)});
+  });
+  window.nusakinhoCloudSave=async data=>{
+   if(!currentUser||!remoteReady)return;
+   saveQueue=saveQueue.then(()=>set(ref(database,'nusakinho'),data));return saveQueue;
+  };
+ }catch(e){message('Erro na configuração Firebase: '+e.message)}
+}
+const saved=readConfig();if(saved){$('firebaseConfigInput').value=JSON.stringify(saved,null,2);try{localStorage.setItem(CONFIG_KEY,JSON.stringify(saved))}catch(e){}}
+initFirebase();
+</script>
+</body>
+</html>
